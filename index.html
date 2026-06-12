@@ -66,23 +66,10 @@
             border: 2px solid var(--accent-blue);
         }
 
-        .btn-player {
-            background: transparent;
-            color: var(--accent-blue);
-        }
-
-        .btn-player:hover {
-            background: rgba(0, 86, 179, 0.05);
-        }
-
-        .btn-owner {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        .btn-owner:hover {
-            background: #004494;
-        }
+        .btn-player { background: transparent; color: var(--accent-blue); }
+        .btn-player:hover { background: rgba(0, 86, 179, 0.05); }
+        .btn-owner { background: var(--accent-blue); color: white; }
+        .btn-owner:hover { background: #004494; }
 
         /* Головний контент сайту (спочатку прихований) */
         .main-content {
@@ -163,7 +150,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 25px;
             box-sizing: border-box;
-            display: none; /* Показується тільки адміну */
+            display: none;
         }
 
         .creator-title {
@@ -218,7 +205,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         table {
@@ -266,22 +253,38 @@
         }
 
         .btn-add { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; width: 100%; }
-        .btn-delete { background: transparent; color: var(--text-muted); border: none; font-size: 1.2rem; }
+        .btn-delete { background: transparent; color: #cc0000; border: none; font-size: 1.2rem; cursor: pointer; }
         
-        .action-header, .action-cell { display: none; }
+        .logout-section {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .btn-logout {
+            background: #e2e8f0;
+            border: none;
+            color: #555;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+        .btn-logout:hover { background: #cbd5e1; }
     </style>
 </head>
 <body>
 
-    <!-- ЕКРАН ВИБОРУ РОЛІ -->
     <div class="role-selection" id="role-screen">
         <div class="role-title">Select Your Role</div>
         <button class="role-btn btn-player" onclick="selectRole('player')">Player</button>
         <button class="role-btn btn-owner" onclick="selectRole('owner')">Owner / Admin</button>
     </div>
 
-    <!-- ГОЛОВНИЙ КОНТЕНТ САЙТУ -->
     <div class="main-content" id="main-content">
+        
+        <div class="logout-section">
+            <button class="btn-logout" onclick="logout()">← Change Role / Log Out</button>
+        </div>
+
         <div class="header-wrapper">
             <div class="header-section">
                 <h1 id="main-title">WFC Kit List</h1>
@@ -294,13 +297,14 @@
             </div>
         </div>
 
-        <!-- Панель додавання (тільки для Owner) -->
         <div class="match-creator" id="admin-panel">
             <div class="creator-title">Add / Update Club Contacts (Admin Mode)</div>
             <div class="inputs-row">
                 <div class="input-group">
                     <label>Club Name</label>
-                    <select id="kit-club"></select>
+                    <select id="kit-club">
+                        <option value="">-- Select Club --</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>Manager Name</label>
@@ -323,7 +327,7 @@
                         <th style="text-align: left; padding-left: 25px;">Club</th>
                         <th style="text-align: left;">Manager / Owner</th>
                         <th style="text-align: left;">Telegram Contact</th>
-                        <th class="action-header" id="th-action"></th>
+                        <th id="th-action" style="display: none; width: 50px;"></th>
                     </tr>
                 </thead>
                 <tbody id="kits-body"></tbody>
@@ -336,10 +340,27 @@
         let isAdmin = false;
         let kitsList = [];
 
-        const defaultD1 = ["Black Knights", "Phoenix FC", "Noble Lions", "Horizon", "Wild Panthers", "United FC", "Albion", "Town Wanderers", "Vortex FC"];
-        const defaultD2 = ["Нова Команда D2"];
+        // ==========================================
+        // ✍️ ТУТ ТИ МОЖЕШ МІНЯТИ НАЗВИ СВОЇХ КЛУБІВ:
+        // ==========================================
+        const defaultD1 = [
+            "Black Knights", 
+            "Phoenix FC", 
+            "Noble Lions", 
+            "Horizon", 
+            "Wild Panthers", 
+            "United FC", 
+            "Albion", 
+            "Town Wanderers", 
+            "Vortex FC"
+        ];
+        
+        const defaultD2 = [
+            "Нова Команда D2",
+            "Альтернативний Клуб"
+        ];
+        // ==========================================
 
-        // Функція вибору ролі
         function selectRole(role) {
             if (role === 'owner') {
                 let pass = prompt("Enter Admin Password:");
@@ -349,11 +370,14 @@
                     document.getElementById('th-action').style.display = 'table-cell';
                 } else {
                     alert("Wrong password!");
-                    return; // Не пускаємо далі, якщо пароль невірний
+                    return;
                 }
+            } else {
+                isAdmin = false;
+                document.getElementById('admin-panel').style.display = 'none';
+                document.getElementById('th-action').style.display = 'none';
             }
 
-            // Ховаємо вікно вибору, показуємо сайт
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             
@@ -362,14 +386,22 @@
             renderKits();
         }
 
+        function logout() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('role-screen').style.display = 'block';
+        }
+
         function updateTeamsDropdown() {
             const clubSelect = document.getElementById('kit-club');
             if (!clubSelect) return;
+            
             let teams = currentDivision === 'D1' ? defaultD1 : defaultD2;
             clubSelect.innerHTML = '<option value="">-- Select Club --</option>';
+            
             teams.forEach(team => {
                 let opt = document.createElement('option');
-                opt.value = team; opt.innerText = team;
+                opt.value = team;
+                opt.innerText = team;
                 clubSelect.appendChild(opt);
             });
         }
@@ -379,22 +411,38 @@
             document.getElementById('btn-d1').classList.toggle('active', div === 'D1');
             document.getElementById('btn-d2').classList.toggle('active', div === 'D2');
             document.getElementById('div-badge').innerText = div;
+            
             updateTeamsDropdown();
             loadKits();
             renderKits();
         }
 
         function addKitRecord() {
-            const clubVal = document.getElementById('kit-club').value;
-            const ownerVal = document.getElementById('kit-owner').value.trim();
-            let tgVal = document.getElementById('kit-tg').value.trim();
+            const clubSelect = document.getElementById('kit-club');
+            const ownerInput = document.getElementById('kit-owner');
+            const tgInput = document.getElementById('kit-tg');
 
-            if (!clubVal || !ownerVal) return alert("Fill in the fields!");
+            const clubVal = clubSelect.value;
+            const ownerVal = ownerInput.value.trim();
+            let tgVal = tgInput.value.trim();
+
+            if (!clubVal || !ownerVal) {
+                alert("Please select a club and enter a manager name!");
+                return;
+            }
 
             let displayTg = tgVal || "Not Provided";
             let tgLink = tgVal ? `https://t.me/${tgVal.replace('@', '')}` : "";
 
-            let newRecord = { id: Date.now(), club: clubVal, owner: ownerVal, tgDisplay: displayTg, tgUrl: tgLink };
+            let newRecord = { 
+                id: Date.now(), 
+                club: clubVal, 
+                owner: ownerVal, 
+                tgDisplay: displayTg, 
+                tgUrl: tgLink 
+            };
+
+            // Видаляємо старий запис цього клубу, якщо він був, щоб замінити новим
             kitsList = kitsList.filter(k => k.club !== clubVal);
             kitsList.push(newRecord);
             kitsList.sort((a,b) => a.club.localeCompare(b.club));
@@ -402,10 +450,10 @@
             saveKits();
             renderKits();
 
-            // Очищення полів
-            document.getElementById('kit-club').value = "";
-            document.getElementById('kit-owner').value = "";
-            document.getElementById('kit-tg').value = "";
+            // Очищення полів після збереження
+            clubSelect.value = "";
+            ownerInput.value = "";
+            tgInput.value = "";
         }
 
         function deleteKitRecord(id) {
@@ -428,7 +476,7 @@
 
             kitsList.forEach(record => {
                 let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link">${record.tgDisplay}</a>` : `<span>${record.tgDisplay}</span>`;
-                let actionCell = isAdmin ? `<td class="action-cell" style="display:table-cell;"><button class="btn-delete" onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
+                let actionCell = isAdmin ? `<td style="text-align: center;"><button class="btn-delete" onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
                 
                 tbody.innerHTML += `<tr>
                     <td class="club-col">${record.club}</td>
@@ -439,8 +487,13 @@
             });
         }
 
-        function saveKits() { localStorage.setItem(`wfc_${currentDivision}`, JSON.stringify(kitsList)); }
-        function loadKits() { kitsList = JSON.parse(localStorage.getItem(`wfc_${currentDivision}`)) || []; }
+        function saveKits() { 
+            localStorage.setItem(`wfc_live_${currentDivision}`, JSON.stringify(kitsList)); 
+        }
+        
+        function loadKits() { 
+            kitsList = JSON.parse(localStorage.getItem(`wfc_live_${currentDivision}`)) || []; 
+        }
     </script>
 </body>
 </html>
