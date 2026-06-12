@@ -24,7 +24,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 10px;
+            padding: 20px 15px;
             margin: 0;
         }
 
@@ -36,7 +36,7 @@
             justify-content: center;
             margin-top: 60px;
             background: var(--card-bg);
-            padding: 30px 20px;
+            padding: 35px 25px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
@@ -77,13 +77,18 @@
             box-sizing: border-box;
         }
 
+        /* Навігаційна панель — виправлена для ПК та телефонів */
         .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            gap: 10px;
+            margin-bottom: 25px;
+            gap: 15px;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
         .btn-logout {
@@ -95,7 +100,9 @@
             font-weight: 700;
             border-radius: 6px;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-logout:hover { background: #cbd5e1; }
 
         .division-toggle {
             display: flex;
@@ -108,9 +115,9 @@
         .div-btn {
             background: transparent;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 18px;
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 0.95rem;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -129,7 +136,7 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -141,7 +148,7 @@
         }
 
         .current-div-badge {
-            font-size: 1rem;
+            font-size: 1.1rem;
             vertical-align: super;
             color: var(--accent-blue);
             margin-left: 5px;
@@ -212,14 +219,19 @@
             padding: 12px 24px;
             font-size: 1rem;
             width: 100%;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
         }
+        .btn-add:hover { background: #004494; }
 
-        /* Контейнер таблиці та адаптивність */
+        /* Контейнер таблиці */
         .table-container {
             width: 100%;
             background: var(--card-bg);
             border-radius: 12px;
-            overflow-x: auto; /* Дозволяє скролити таблицю вбік на телефонах */
+            overflow-x: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             -webkit-overflow-scrolling: touch;
@@ -228,7 +240,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px; /* Захищає колонки від повного стискання */
+            min-width: 600px;
         }
 
         thead {
@@ -280,18 +292,28 @@
             padding: 5px 10px;
         }
 
-        /* Налаштування під мобільні екрани */
+        /* 📱 ОНОВЛЕНА АДАПТИВНІСТЬ ДЛЯ ТЕЛЕФОНІВ (НІЧОГО НЕ ЗАКРИВАЄ ЕКРАН) */
         @media (max-width: 600px) {
-            body { padding: 10px 5px; }
-            .top-bar { flex-direction: column-reverse; align-items: stretch; gap: 15px; }
-            .division-toggle { justify-content: center; }
-            .div-btn { flex: 1; text-align: center; padding: 12px; }
-            .btn-logout { padding: 12px; text-align: center; }
+            body { padding: 10px 8px; }
+            
+            /* Панель кнопок перетворюється на акуратну колонку вгорі */
+            .top-bar { 
+                flex-direction: column; 
+                align-items: stretch; 
+                padding: 10px;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .division-toggle { width: 100%; }
+            .div-btn { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; }
+            .btn-logout { width: 100%; text-align: center; padding: 10px; font-size: 0.9rem; }
             
             .inputs-row { flex-direction: column; align-items: stretch; }
             .input-group { min-width: 100%; }
             
             h1 { font-size: 1.6rem; }
+            .header-section { margin-bottom: 15px; }
         }
     </style>
 </head>
@@ -374,7 +396,6 @@
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             
-            // ВАЖЛИВО: Спочатку виставляємо видимість адмінки, а ПЕРЕД рендером завантажуємо дані!
             syncAdminUI();
             loadKits();
             renderKits();
@@ -431,7 +452,6 @@
                 tgUrl: tgLink 
             };
 
-            // Перевіряємо та перезаписуємо старий заголовок клубу (без дублів)
             kitsList = kitsList.filter(k => k.club.toLowerCase() !== clubVal.toLowerCase());
             kitsList.push(newRecord);
             kitsList.sort((a,b) => a.club.localeCompare(b.club));
@@ -439,7 +459,6 @@
             saveKits();
             renderKits();
 
-            // Чистимо інпути
             clubInput.value = "";
             ownerInput.value = "";
             tgInput.value = "";
@@ -476,13 +495,13 @@
             });
         }
 
-        // Повністю перероблена робота з ключами пам'яті
+        // Покращене збереження з підтримкою стабільного глобального ключа
         function saveKits() { 
-            localStorage.setItem(`wfc_stable_${currentDivision}`, JSON.stringify(kitsList)); 
+            localStorage.setItem(`wfc_v3_${currentDivision}`, JSON.stringify(kitsList)); 
         }
         
         function loadKits() { 
-            kitsList = JSON.parse(localStorage.getItem(`wfc_stable_${currentDivision}`)) || []; 
+            kitsList = JSON.parse(localStorage.getItem(`wfc_v3_${currentDivision}`)) || []; 
         }
     </script>
 </body>
