@@ -1,1 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WFC Kit List & Contacts</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght=400;500;700;900&display=swap');
 
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --accent-blue: #0056b3;
+            --text-main: #333333;
+            --text-muted: #777777;
+            --border-color: #eaeaea;
+            --tg-color: #0088cc;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+            position: relative;
+        }
+
+        .header-wrapper {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .header-section {
+            text-align: center;
+            max-width: 70%;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            padding-bottom: 10px;
+            color: #111;
+            border-bottom: 3px solid var(--accent-blue);
+            display: inline-block;
+        }
+
+        body.is-admin h1 {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        body.is-admin h1:hover {
+            background: rgba(0, 86, 179, 0.05);
+            border-radius: 4px;
+        }
+        body.is-admin h1:focus {
+            outline: 2px dashed var(--accent-blue);
+            background: #fff;
+        }
+
+        .division-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .div-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #555;
+        }
+
+        .div-btn.active {
+            background: var(--card-bg);
+            color: var(--accent-blue);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .current-div-badge {
+            font-size: 1rem;
+            vertical-align: super;
+            color: var(--accent-blue);
+            margin-left: 5px;
+            font-weight: 900;
+        }
+
+        .match-creator {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        body.is-admin .match-creator {
+            display: block;
+        }
+
+        .creator-title {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--accent-blue);
+            letter-spacing: 0.5px;
+        }
+
+        .inputs-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 2;
+            min-width: 150px;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        select, input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+            background: #f9f9f9;
+            color: #333;
+            outline: none;
+            transition: 0.2s;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent-blue);
+            background: #fff;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #fafafa;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th {
+            padding: 15px 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-weight: 600;
+        }
+
+        .club-col {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: left;
+            padding-left: 25px;
+            width: 35%;
+        }
+
+        .owner-col {
+            color: #333;
+            text-align: left;
+            width: 30%;
+        }
+
+        .tg-col {
+            text-align: left;
+            width: 25%;
+        }
+
+        .tg-link {
+            color: var(--tg-color);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tg-link:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #f0f0f0;
+        }
+
+        .btn-add {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+            padding: 11px 25px;
+            width: 100%;
+        }
+
+        .btn-add:hover {
+            background: #004494;
+        }
+
+        .btn-delete {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            font-size: 1.2rem;
+            padding: 0;
+            width: auto;
+            display: none;
+        }
+
+        body.is-admin .btn-delete {
+            display: inline-block;
+        }
+
+        th.action-header, td.action-cell {
+            display: none;
+        }
+        body.is-admin th.action-header, 
+        body.is-admin td.action-cell {
+            display: table-cell;
+        }
+
+        .hide-management .match-creator,
+        .hide-management .btn-delete,
+        .hide-management th.action-header,
+        .hide-management td.action-cell {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-wrapper">
+        <div class="header-section">
+            <h1 id="main-title" contenteditable="false" onblur="saveTitle()" onkeydown="checkEnter(event)">WFC Kit List</h1>
+            <span class="current-div-badge" id="div-badge">D1</span>
+        </div>
+        
+        <div class="division-toggle">
+            <button id="btn-d1" class="div-btn active" onclick="switchDivision('D1')">D1</button>
+            <button id="btn-d2" class="div-btn" onclick="switchDivision('D2')">D2</button>
+        </div>
+    </div>
+
+    <div class="match-creator">
+        <div class="creator-title">Add / Update Club Contacts</div>
+        <div class="inputs-row">
+            <div class="input-group" style="flex: 2;">
+                <label>Club Name</label>
+                <select id="kit-club"></select>
+            </div>
+            
+            <div class="input-group" style="flex: 2;">
+                <label>Manager / Owner Name</label>
+                <input type="text" id="kit-owner" placeholder="e.g. Jura">
+            </div>
+
+            <div class="input-group" style="flex: 2;">
+                <label>Telegram Username</label>
+                <input type="text" id="kit-tg" placeholder="e.g. @username">
+            </div>
+
+            <div style="flex: 1.2; min-width: 150px;">
+                <button class="btn-add" onclick="addKitRecord()">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding-left: 25px;">Club</th>
+                    <th style="text-align: left;">Manager / Owner</th>
+                    <th style="text-align: left;">Telegram Contact</th>
+                    <th class="action-header"></th>
+                </tr>
+            </thead>
+            <tbody id="kits-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Сюди вписано захешований пароль "5555". Гравці побачать тільки цей набір букв і цифр.
+        const ADMIN_HASH = "b59c67bf196a4758191e42f76670ceba"; 
+
+        let currentDivision = 'D1';
+        let isManagementHidden = false;
+        let isAdmin = false;
+        
+        let kitsList = [];
+        let teamsList = [];
+
+        const defaultD1 = ["Black Knights", "Phoenix FC", "Noble Lions", "Horizon", "Wild Panthers", "United FC", "Albion", "Town Wanderers", "Vortex FC"];
+        const defaultD2 = ["Нова Команда D2"];
+
+        function checkAdminAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminParam = urlParams.get('admin');
+            
+            if (adminParam) {
+                // Перетворюємо введений пароль у хеш і порівнюємо
+                const inputHash = CryptoJS.MD5(adminParam).toString();
+                if (inputHash === ADMIN_HASH) {
+                    isAdmin = true;
+                    document.body.classList.add('is-admin');
+                    document.getElementById('main-title').setAttribute('contenteditable', 'true');
+                }
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (!isAdmin) return; 
+            if (event.key.toLowerCase() === 'h' || event.key.toLowerCase() === 'р') {
+                if (document.activeElement.getAttribute('contenteditable') === 'true' || 
+                    document.activeElement.tagName === 'INPUT' || 
+                    document.activeElement.tagName === 'SELECT') return;
+                
+                isManagementHidden = !isManagementHidden;
+                document.body.classList.toggle('hide-management', isManagementHidden);
+            }
+        });
+
+        function loadTitle() {
+            const savedTitle = localStorage.getItem('wfc_kits_title');
+            if (savedTitle) {
+                document.getElementById('main-title').innerText = savedTitle;
+            }
+        }
+
+        function saveTitle() {
+            if (!isAdmin) return;
+            const titleText = document.getElementById('main-title').innerText.trim();
+            localStorage.setItem('wfc_kits_title', titleText || 'WFC Kit List');
+        }
+
+        function checkEnter(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('main-title').blur();
+            }
+        }
+
+        function updateTeamsDropdown() {
+            const teamKey = `wfc_teams_${currentDivision.toLowerCase()}`;
+            const storedTeams = JSON.parse(localStorage.getItem(teamKey));
+            
+            if (storedTeams && storedTeams.length > 0) {
+                teamsList = storedTeams.map(t => t.name);
+            } else {
+                teamsList = currentDivision === 'D1' ? [...defaultD1] : [...defaultD2];
+            }
+
+            const clubSelect = document.getElementById('kit-club');
+            if(clubSelect) {
+                clubSelect.innerHTML = '<option value="">-- Select Club --</option>';
+                teamsList.forEach(team => {
+                    const opt = document.createElement('option');
+                    opt.value = team;
+                    opt.innerText = team;
+                    clubSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function switchDivision(div) {
+            currentDivision = div;
+            document.getElementById('btn-d1').classList.toggle('active', div === 'D1');
+            document.getElementById('btn-d2').classList.toggle('active', div === 'D2');
+            document.getElementById('div-badge').innerText = div;
+            
+            updateTeamsDropdown();
+            loadKits();
+            renderKits();
+        }
+
+        function addKitRecord() {
+            if (!isAdmin) return;
+            const clubVal = document.getElementById('kit-club').value;
+            const ownerVal = document.getElementById('kit-owner').value.trim();
+            let tgVal = document.getElementById('kit-tg').value.trim();
+
+            if (!clubVal) {
+                alert("Please select a club!");
+                return;
+            }
+            if (!ownerVal) {
+                alert("Please enter the manager or owner's name!");
+                return;
+            }
+
+            let displayTg = tgVal || "Not Provided";
+            let tgLink = "";
+            if (tgVal) {
+                let cleanUsername = tgVal.replace('@', '').trim();
+                tgLink = `https://t.me/${cleanUsername}`;
+                if (!tgVal.startsWith('@')) {
+                    displayTg = '@' + tgVal;
+                }
+            }
+
+            const newRecord = {
+                id: Date.now(),
+                club: clubVal,
+                owner: ownerVal,
+                tgDisplay: displayTg,
+                tgUrl: tgLink
+            };
+
+            kitsList = kitsList.filter(k => k.club.toLowerCase() !== clubVal.toLowerCase());
+            kitsList.push(newRecord);
+            kitsList.sort((a, b) => a.club.localeCompare(b.club));
+
+            saveKits();
+            renderKits();
+
+            document.getElementById('kit-club').value = "";
+            document.getElementById('kit-owner').value = "";
+            document.getElementById('kit-tg').value = "";
+        }
+
+        function deleteKitRecord(id) {
+            if (!isAdmin) return;
+            if(confirm("Delete this club contact from the list?")) {
+                kitsList = kitsList.filter(k => k.id !== id);
+                saveKits();
+                renderKits();
+            }
+        }
+
+        function renderKits() {
+            const tbody = document.getElementById('kits-body');
+            tbody.innerHTML = '';
+
+            if(kitsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px;">No contacts added yet for this division</td></tr>`;
+                return;
+            }
+
+            kitsList.forEach(record => {
+                let tgCell = `<span>${record.tgDisplay}</span>`;
+                if (record.tgUrl) {
+                    tgCell = `<a href="${record.tgUrl}" target="_blank" class="tg-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.11.02-1.93 1.23-5.46 3.62-.51.35-.98.53-1.39.51-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.74 3.99-1.73 6.66-2.88 8.01-3.43 3.81-1.56 4.6-1.83 5.12-1.84.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.13-.03.19z"/></svg>
+                                ${record.tgDisplay}
+                              </a>`;
+                }
+
+                const row = `
+                    <tr>
+                        <td class="club-col">${record.club}</td>
+                        <td class="owner-col">${record.owner}</td>
+                        <td class="tg-col">${tgCell}</td>
+                        ${isAdmin ? `<td class="action-cell"><button class="btn-delete" title="Delete Record" onclick="deleteKitRecord(${record.id})">✕</button></td>` : ''}
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function saveKits() {
+            localStorage.setItem(`wfc_kits_${currentDivision.toLowerCase()}`, JSON.stringify(kitsList));
+        }
+
+        function loadKits() {
+            const stored = localStorage.getItem(`wfc_kits_${currentDivision.toLowerCase()}`);
+            kitsList = stored ? JSON.parse(stored) : [];
+        }
+
+        checkAdminAccess();
+        loadTitle();
+        updateTeamsDropdown();
+        loadKits();
+        renderKits();
+    </script>
+</body>
+</html>
