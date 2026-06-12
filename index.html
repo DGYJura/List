@@ -24,7 +24,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding: 20px 10px;
             margin: 0;
         }
 
@@ -34,9 +34,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-top: 100px;
+            margin-top: 60px;
             background: var(--card-bg);
-            padding: 40px;
+            padding: 30px 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
@@ -55,9 +55,9 @@
 
         .role-btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             margin-bottom: 15px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
             text-transform: uppercase;
             border-radius: 8px;
@@ -67,65 +67,37 @@
         }
 
         .btn-player { background: transparent; color: var(--accent-blue); }
-        .btn-player:hover { background: rgba(0, 86, 179, 0.05); }
         .btn-owner { background: var(--accent-blue); color: white; }
-        .btn-owner:hover { background: #004494; }
 
-        /* Головний контент сайту (спочатку прихований) */
+        /* Головний контент сайту */
         .main-content {
             display: none;
             width: 100%;
             max-width: 900px;
+            box-sizing: border-box;
         }
 
-        .logout-section {
+        .top-bar {
             width: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            gap: 10px;
         }
+
         .btn-logout {
             background: #e2e8f0;
             border: none;
             color: #555;
-            padding: 8px 16px;
-            font-size: 0.8rem;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
             border-radius: 6px;
             cursor: pointer;
         }
-        .btn-logout:hover { background: #cbd5e1; }
-
-        .header-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .header-section {
-            text-align: center;
-            max-width: 70%;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            padding-bottom: 10px;
-            color: #111;
-            border-bottom: 3px solid var(--accent-blue);
-            display: inline-block;
-        }
 
         .division-toggle {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
             display: flex;
             gap: 5px;
             background: #e2e8f0;
@@ -138,7 +110,7 @@
             border: none;
             padding: 8px 16px;
             font-weight: 900;
-            font-size: 0.9rem;
+            font-size: 1rem;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -151,6 +123,23 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
+        .header-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            padding-bottom: 8px;
+            color: #111;
+            border-bottom: 3px solid var(--accent-blue);
+            display: inline-block;
+        }
+
         .current-div-badge {
             font-size: 1rem;
             vertical-align: super;
@@ -159,6 +148,7 @@
             font-weight: 900;
         }
 
+        /* Панель адміністратора */
         .match-creator {
             width: 100%;
             background: var(--card-bg);
@@ -177,7 +167,6 @@
             margin-top: 0;
             margin-bottom: 15px;
             color: var(--accent-blue);
-            letter-spacing: 0.5px;
         }
 
         .inputs-row {
@@ -191,8 +180,8 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-            flex: 2;
-            min-width: 150px;
+            flex: 1;
+            min-width: 200px;
         }
 
         .input-group label {
@@ -203,7 +192,7 @@
         }
 
         input[type="text"] {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-family: 'Roboto', sans-serif;
@@ -211,24 +200,35 @@
             background: #f9f9f9;
             color: #333;
             outline: none;
-            transition: 0.2s;
+            font-size: 1rem;
             box-sizing: border-box;
             width: 100%;
         }
 
-        .container {
+        .btn-add { 
+            background: var(--accent-blue); 
+            border-color: var(--accent-blue); 
+            color: #fff; 
+            padding: 12px 24px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        /* Контейнер таблиці та адаптивність */
+        .table-container {
             width: 100%;
             background: var(--card-bg);
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto; /* Дозволяє скролити таблицю вбік на телефонах */
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: center;
+            min-width: 600px; /* Захищає колонки від повного стискання */
         }
 
         thead {
@@ -237,23 +237,25 @@
         }
 
         th {
-            padding: 15px 10px;
+            padding: 15px 12px;
             color: var(--text-muted);
             font-size: 0.85rem;
             text-transform: uppercase;
             font-weight: 700;
+            text-align: left;
         }
 
         td {
-            padding: 15px 10px;
+            padding: 15px 12px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
             font-weight: 600;
+            text-align: left;
         }
 
-        .club-col { font-size: 1.1rem; font-weight: 700; text-align: left; padding-left: 25px; width: 35%; color: #111; }
-        .owner-col { color: #333; text-align: left; width: 30%; }
-        .tg-col { text-align: left; width: 25%; }
+        .club-col { font-size: 1.05rem; font-weight: 700; color: #111; width: 35%; }
+        .owner-col { color: #333; width: 35%; }
+        .tg-col { width: 25%; }
 
         .tg-link {
             color: #ffffff;
@@ -263,28 +265,34 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
-            transition: background-color 0.2s;
+            white-space: nowrap;
         }
 
-        .tg-link:hover {
-            background-color: #0077b3;
+        .btn-delete { 
+            background: transparent; 
+            color: #cc0000; 
+            border: none; 
+            font-size: 1.3rem; 
+            cursor: pointer;
+            padding: 5px 10px;
         }
 
-        .tg-icon {
-            font-size: 0.95rem;
+        /* Налаштування під мобільні екрани */
+        @media (max-width: 600px) {
+            body { padding: 10px 5px; }
+            .top-bar { flex-direction: column-reverse; align-items: stretch; gap: 15px; }
+            .division-toggle { justify-content: center; }
+            .div-btn { flex: 1; text-align: center; padding: 12px; }
+            .btn-logout { padding: 12px; text-align: center; }
+            
+            .inputs-row { flex-direction: column; align-items: stretch; }
+            .input-group { min-width: 100%; }
+            
+            h1 { font-size: 1.6rem; }
         }
-
-        button {
-            background: white; color: #333; border: 1px solid #ccc; padding: 10px 20px;
-            border-radius: 6px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.85rem;
-        }
-
-        .btn-add { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; width: 100%; }
-        .btn-add:hover { background: #004494; }
-        .btn-delete { background: transparent; color: #cc0000; border: none; font-size: 1.2rem; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -297,24 +305,20 @@
 
     <div class="main-content" id="main-content">
         
-        <div class="logout-section">
-            <button class="btn-logout" onclick="logout()">← Change Role / Log Out</button>
+        <div class="top-bar">
+            <button class="btn-logout" onclick="logout()">← Change Role</button>
+            <div class="division-toggle">
+                <button id="btn-d1" class="div-btn active" onclick="switchDivision('D1')">D1 League</button>
+                <button id="btn-d2" class="div-btn" onclick="switchDivision('D2')">D2 League</button>
+            </div>
         </div>
 
-        <div class="header-wrapper">
-            <div class="header-section">
-                <h1 id="main-title">WFC Kit List</h1>
-                <span class="current-div-badge" id="div-badge">D1</span>
-            </div>
-            
-            <div class="division-toggle">
-                <button id="btn-d1" class="div-btn active" onclick="switchDivision('D1')">D1</button>
-                <button id="btn-d2" class="div-btn" onclick="switchDivision('D2')">D2</button>
-            </div>
+        <div class="header-section">
+            <h1 id="main-title">WFC Kit List <span class="current-div-badge" id="div-badge">D1</span></h1>
         </div>
 
         <div class="match-creator" id="admin-panel">
-            <div class="creator-title">Add / Update Club Contacts (Admin Mode)</div>
+            <div class="creator-title">Add / Update Contacts (Admin Mode)</div>
             <div class="inputs-row">
                 <div class="input-group">
                     <label>Club Name</label>
@@ -328,20 +332,20 @@
                     <label>Telegram Username</label>
                     <input type="text" id="kit-tg" placeholder="e.g. @Yura_053">
                 </div>
-                <div>
-                    <button class="btn-add" onclick="addKitRecord()">Save</button>
+                <div style="width: 100%; margin-top: 5px;">
+                    <button class="btn-add" onclick="addKitRecord()">Save Record</button>
                 </div>
             </div>
         </div>
 
-        <div class="container">
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="text-align: left; padding-left: 25px;">Club</th>
-                        <th style="text-align: left;">Manager / Owner</th>
-                        <th style="text-align: left;">Telegram Contact</th>
-                        <th id="th-action" style="display: none; width: 50px;"></th>
+                        <th style="padding-left: 15px;">Club</th>
+                        <th>Manager / Owner</th>
+                        <th>Telegram Contact</th>
+                        <th id="th-action" style="display: none; width: 60px; text-align: center;"></th>
                     </tr>
                 </thead>
                 <tbody id="kits-body"></tbody>
@@ -359,21 +363,19 @@
                 let pass = prompt("Enter Admin Password:");
                 if (pass === "5555") {
                     isAdmin = true;
-                    document.getElementById('admin-panel').style.display = 'block';
-                    document.getElementById('th-action').style.display = 'table-cell';
                 } else {
                     alert("Wrong password!");
                     return;
                 }
             } else {
                 isAdmin = false;
-                document.getElementById('admin-panel').style.display = 'none';
-                document.getElementById('th-action').style.display = 'none';
             }
 
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             
+            // ВАЖЛИВО: Спочатку виставляємо видимість адмінки, а ПЕРЕД рендером завантажуємо дані!
+            syncAdminUI();
             loadKits();
             renderKits();
         }
@@ -393,6 +395,16 @@
             renderKits();
         }
 
+        function syncAdminUI() {
+            if (isAdmin) {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('th-action').style.display = 'table-cell';
+            } else {
+                document.getElementById('admin-panel').style.display = 'none';
+                document.getElementById('th-action').style.display = 'none';
+            }
+        }
+
         function addKitRecord() {
             const clubInput = document.getElementById('kit-club');
             const ownerInput = document.getElementById('kit-owner');
@@ -408,7 +420,6 @@
             }
 
             let displayTg = tgVal || "Not Provided";
-            // Автоматично прибираємо @ з посилання, якщо користувач його ввів
             let cleanTg = tgVal.replace('@', '');
             let tgLink = tgVal ? `https://t.me/${cleanTg}` : "";
 
@@ -420,17 +431,15 @@
                 tgUrl: tgLink 
             };
 
-            // Якщо клуб з такою назвою вже є у списку цієї ліги — оновлюємо його
+            // Перевіряємо та перезаписуємо старий заголовок клубу (без дублів)
             kitsList = kitsList.filter(k => k.club.toLowerCase() !== clubVal.toLowerCase());
             kitsList.push(newRecord);
-            
-            // Сортування за алфавітом назв клубів
             kitsList.sort((a,b) => a.club.localeCompare(b.club));
 
             saveKits();
             renderKits();
 
-            // Очищення полів форми
+            // Чистимо інпути
             clubInput.value = "";
             ownerInput.value = "";
             tgInput.value = "";
@@ -450,13 +459,12 @@
             tbody.innerHTML = '';
             
             if(kitsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px;">No contacts added yet for ${currentDivision}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px; text-align: center;">No contacts added yet for ${currentDivision}</td></tr>`;
                 return;
             }
 
             kitsList.forEach(record => {
-                // Додаємо красиву кнопку з літачком Телеграму (✈)
-                let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link"><span class="tg-icon">✈</span> ${record.tgDisplay}</a>` : `<span style="color: var(--text-muted); font-style: italic;">${record.tgDisplay}</span>`;
+                let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link">✈ ${record.tgDisplay}</a>` : `<span style="color: var(--text-muted); font-style: italic;">${record.tgDisplay}</span>`;
                 let actionCell = isAdmin ? `<td style="text-align: center;"><button class="btn-delete" onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
                 
                 tbody.innerHTML += `<tr>
@@ -468,12 +476,13 @@
             });
         }
 
+        // Повністю перероблена робота з ключами пам'яті
         function saveKits() { 
-            localStorage.setItem(`wfc_v2_${currentDivision}`, JSON.stringify(kitsList)); 
+            localStorage.setItem(`wfc_stable_${currentDivision}`, JSON.stringify(kitsList)); 
         }
         
         function loadKits() { 
-            kitsList = JSON.parse(localStorage.getItem(`wfc_v2_${currentDivision}`)) || []; 
+            kitsList = JSON.parse(localStorage.getItem(`wfc_stable_${currentDivision}`)) || []; 
         }
     </script>
 </body>
