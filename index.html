@@ -28,9 +28,71 @@
             margin: 0;
         }
 
-        .header-wrapper {
+        /* Екран вибору ролі */
+        .role-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 100px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .role-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            color: #111;
+        }
+
+        .role-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .btn-player {
+            background: transparent;
+            color: var(--accent-blue);
+        }
+
+        .btn-player:hover {
+            background: rgba(0, 86, 179, 0.05);
+        }
+
+        .btn-owner {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-owner:hover {
+            background: #004494;
+        }
+
+        /* Головний контент сайту (спочатку прихований) */
+        .main-content {
+            display: none;
             width: 100%;
             max-width: 900px;
+        }
+
+        .header-wrapper {
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -53,7 +115,6 @@
             color: #111;
             border-bottom: 3px solid var(--accent-blue);
             display: inline-block;
-            cursor: pointer;
         }
 
         .division-toggle {
@@ -96,14 +157,13 @@
 
         .match-creator {
             width: 100%;
-            max-width: 900px;
             background: var(--card-bg);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 25px;
             box-sizing: border-box;
-            display: none;
+            display: none; /* Показується тільки адміну */
         }
 
         .creator-title {
@@ -154,7 +214,6 @@
 
         .container {
             width: 100%;
-            max-width: 900px;
             background: var(--card-bg);
             border-radius: 12px;
             overflow: hidden;
@@ -207,59 +266,69 @@
         }
 
         .btn-add { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; width: 100%; }
-        .btn-delete { background: transparent; color: var(--text-muted); border: none; font-size: 1.2rem; display: none; }
+        .btn-delete { background: transparent; color: var(--text-muted); border: none; font-size: 1.2rem; }
         
         .action-header, .action-cell { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="header-wrapper">
-        <div class="header-section">
-            <!-- Клік по заголовку відкриє вікно пароля -->
-            <h1 id="main-title" onclick="askAdminPassword()">WFC Kit List</h1>
-            <span class="current-div-badge" id="div-badge">D1</span>
-        </div>
-        
-        <div class="division-toggle">
-            <button id="btn-d1" class="div-btn active" onclick="switchDivision('D1')">D1</button>
-            <button id="btn-d2" class="div-btn" onclick="switchDivision('D2')">D2</button>
-        </div>
+    <!-- ЕКРАН ВИБОРУ РОЛІ -->
+    <div class="role-selection" id="role-screen">
+        <div class="role-title">Select Your Role</div>
+        <button class="role-btn btn-player" onclick="selectRole('player')">Player</button>
+        <button class="role-btn btn-owner" onclick="selectRole('owner')">Owner / Admin</button>
     </div>
 
-    <div class="match-creator" id="admin-panel">
-        <div class="creator-title">Add / Update Club Contacts (Admin)</div>
-        <div class="inputs-row">
-            <div class="input-group">
-                <label>Club Name</label>
-                <select id="kit-club"></select>
+    <!-- ГОЛОВНИЙ КОНТЕНТ САЙТУ -->
+    <div class="main-content" id="main-content">
+        <div class="header-wrapper">
+            <div class="header-section">
+                <h1 id="main-title">WFC Kit List</h1>
+                <span class="current-div-badge" id="div-badge">D1</span>
             </div>
-            <div class="input-group">
-                <label>Manager Name</label>
-                <input type="text" id="kit-owner" placeholder="Jura">
-            </div>
-            <div class="input-group">
-                <label>Telegram</label>
-                <input type="text" id="kit-tg" placeholder="@username">
-            </div>
-            <div>
-                <button class="btn-add" onclick="addKitRecord()">Save</button>
+            
+            <div class="division-toggle">
+                <button id="btn-d1" class="div-btn active" onclick="switchDivision('D1')">D1</button>
+                <button id="btn-d2" class="div-btn" onclick="switchDivision('D2')">D2</button>
             </div>
         </div>
-    </div>
 
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th style="text-align: left; padding-left: 25px;">Club</th>
-                    <th style="text-align: left;">Manager / Owner</th>
-                    <th style="text-align: left;">Telegram Contact</th>
-                    <th class="action-header" id="th-action"></th>
-                </tr>
-            </thead>
-            <tbody id="kits-body"></tbody>
-        </table>
+        <!-- Панель додавання (тільки для Owner) -->
+        <div class="match-creator" id="admin-panel">
+            <div class="creator-title">Add / Update Club Contacts (Admin Mode)</div>
+            <div class="inputs-row">
+                <div class="input-group">
+                    <label>Club Name</label>
+                    <select id="kit-club"></select>
+                </div>
+                <div class="input-group">
+                    <label>Manager Name</label>
+                    <input type="text" id="kit-owner" placeholder="Jura">
+                </div>
+                <div class="input-group">
+                    <label>Telegram</label>
+                    <input type="text" id="kit-tg" placeholder="@username">
+                </div>
+                <div>
+                    <button class="btn-add" onclick="addKitRecord()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding-left: 25px;">Club</th>
+                        <th style="text-align: left;">Manager / Owner</th>
+                        <th style="text-align: left;">Telegram Contact</th>
+                        <th class="action-header" id="th-action"></th>
+                    </tr>
+                </thead>
+                <tbody id="kits-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -270,21 +339,32 @@
         const defaultD1 = ["Black Knights", "Phoenix FC", "Noble Lions", "Horizon", "Wild Panthers", "United FC", "Albion", "Town Wanderers", "Vortex FC"];
         const defaultD2 = ["Нова Команда D2"];
 
-        function askAdminPassword() {
-            let pass = prompt("Введіть пароль адміністратора:");
-            if (pass === "5555") {
-                isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('th-action').style.display = 'table-cell';
-                renderKits();
-                alert("Ви увійшли як адмін!");
-            } else {
-                alert("Невірний пароль!");
+        // Функція вибору ролі
+        function selectRole(role) {
+            if (role === 'owner') {
+                let pass = prompt("Enter Admin Password:");
+                if (pass === "5555") {
+                    isAdmin = true;
+                    document.getElementById('admin-panel').style.display = 'block';
+                    document.getElementById('th-action').style.display = 'table-cell';
+                } else {
+                    alert("Wrong password!");
+                    return; // Не пускаємо далі, якщо пароль невірний
+                }
             }
+
+            // Ховаємо вікно вибору, показуємо сайт
+            document.getElementById('role-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            
+            updateTeamsDropdown();
+            loadKits();
+            renderKits();
         }
 
         function updateTeamsDropdown() {
             const clubSelect = document.getElementById('kit-club');
+            if (!clubSelect) return;
             let teams = currentDivision === 'D1' ? defaultD1 : defaultD2;
             clubSelect.innerHTML = '<option value="">-- Select Club --</option>';
             teams.forEach(team => {
@@ -309,7 +389,7 @@
             const ownerVal = document.getElementById('kit-owner').value.trim();
             let tgVal = document.getElementById('kit-tg').value.trim();
 
-            if (!clubVal || !ownerVal) return alert("Заповніть поля!");
+            if (!clubVal || !ownerVal) return alert("Fill in the fields!");
 
             let displayTg = tgVal || "Not Provided";
             let tgLink = tgVal ? `https://t.me/${tgVal.replace('@', '')}` : "";
@@ -321,10 +401,15 @@
 
             saveKits();
             renderKits();
+
+            // Очищення полів
+            document.getElementById('kit-club').value = "";
+            document.getElementById('kit-owner').value = "";
+            document.getElementById('kit-tg').value = "";
         }
 
         function deleteKitRecord(id) {
-            if(confirm("Видалити?")) {
+            if(confirm("Delete this contact?")) {
                 kitsList = kitsList.filter(k => k.id !== id);
                 saveKits();
                 renderKits();
@@ -333,11 +418,17 @@
 
         function renderKits() {
             const tbody = document.getElementById('kits-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
             
+            if(kitsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px;">No contacts added yet</td></tr>`;
+                return;
+            }
+
             kitsList.forEach(record => {
                 let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link">${record.tgDisplay}</a>` : `<span>${record.tgDisplay}</span>`;
-                let actionCell = isAdmin ? `<td style="display:table-cell;"><button onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
+                let actionCell = isAdmin ? `<td class="action-cell" style="display:table-cell;"><button class="btn-delete" onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
                 
                 tbody.innerHTML += `<tr>
                     <td class="club-col">${record.club}</td>
@@ -350,10 +441,6 @@
 
         function saveKits() { localStorage.setItem(`wfc_${currentDivision}`, JSON.stringify(kitsList)); }
         function loadKits() { kitsList = JSON.parse(localStorage.getItem(`wfc_${currentDivision}`)) || []; }
-
-        updateTeamsDropdown();
-        loadKits();
-        renderKits();
     </script>
 </body>
 </html>
