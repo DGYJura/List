@@ -78,6 +78,23 @@
             max-width: 900px;
         }
 
+        .logout-section {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .btn-logout {
+            background: #e2e8f0;
+            border: none;
+            color: #555;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-logout:hover { background: #cbd5e1; }
+
         .header-wrapper {
             width: 100%;
             display: flex;
@@ -185,7 +202,7 @@
             text-transform: uppercase;
         }
 
-        select, input[type="text"] {
+        input[type="text"] {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -234,17 +251,30 @@
             font-weight: 600;
         }
 
-        .club-col { font-size: 1.1rem; font-weight: 700; text-align: left; padding-left: 25px; width: 35%; }
+        .club-col { font-size: 1.1rem; font-weight: 700; text-align: left; padding-left: 25px; width: 35%; color: #111; }
         .owner-col { color: #333; text-align: left; width: 30%; }
         .tg-col { text-align: left; width: 25%; }
 
         .tg-link {
-            color: var(--tg-color);
+            color: #ffffff;
+            background-color: var(--tg-color);
             text-decoration: none;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+
+        .tg-link:hover {
+            background-color: #0077b3;
+        }
+
+        .tg-icon {
+            font-size: 0.95rem;
         }
 
         button {
@@ -253,22 +283,8 @@
         }
 
         .btn-add { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; width: 100%; }
+        .btn-add:hover { background: #004494; }
         .btn-delete { background: transparent; color: #cc0000; border: none; font-size: 1.2rem; cursor: pointer; }
-        
-        .logout-section {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .btn-logout {
-            background: #e2e8f0;
-            border: none;
-            color: #555;
-            padding: 8px 16px;
-            font-size: 0.8rem;
-        }
-        .btn-logout:hover { background: #cbd5e1; }
     </style>
 </head>
 <body>
@@ -302,17 +318,15 @@
             <div class="inputs-row">
                 <div class="input-group">
                     <label>Club Name</label>
-                    <select id="kit-club">
-                        <option value="">-- Select Club --</option>
-                    </select>
+                    <input type="text" id="kit-club" placeholder="e.g. Black Knights">
                 </div>
                 <div class="input-group">
                     <label>Manager Name</label>
-                    <input type="text" id="kit-owner" placeholder="Jura">
+                    <input type="text" id="kit-owner" placeholder="e.g. Jura">
                 </div>
                 <div class="input-group">
-                    <label>Telegram</label>
-                    <input type="text" id="kit-tg" placeholder="@username">
+                    <label>Telegram Username</label>
+                    <input type="text" id="kit-tg" placeholder="e.g. @Yura_053">
                 </div>
                 <div>
                     <button class="btn-add" onclick="addKitRecord()">Save</button>
@@ -340,27 +354,6 @@
         let isAdmin = false;
         let kitsList = [];
 
-        // ==========================================
-        // ✍️ ТУТ ТИ МОЖЕШ МІНЯТИ НАЗВИ СВОЇХ КЛУБІВ:
-        // ==========================================
-        const defaultD1 = [
-            "Black Knights", 
-            "Phoenix FC", 
-            "Noble Lions", 
-            "Horizon", 
-            "Wild Panthers", 
-            "United FC", 
-            "Albion", 
-            "Town Wanderers", 
-            "Vortex FC"
-        ];
-        
-        const defaultD2 = [
-            "Нова Команда D2",
-            "Альтернативний Клуб"
-        ];
-        // ==========================================
-
         function selectRole(role) {
             if (role === 'owner') {
                 let pass = prompt("Enter Admin Password:");
@@ -381,7 +374,6 @@
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             
-            updateTeamsDropdown();
             loadKits();
             renderKits();
         }
@@ -391,67 +383,55 @@
             document.getElementById('role-screen').style.display = 'block';
         }
 
-        function updateTeamsDropdown() {
-            const clubSelect = document.getElementById('kit-club');
-            if (!clubSelect) return;
-            
-            let teams = currentDivision === 'D1' ? defaultD1 : defaultD2;
-            clubSelect.innerHTML = '<option value="">-- Select Club --</option>';
-            
-            teams.forEach(team => {
-                let opt = document.createElement('option');
-                opt.value = team;
-                opt.innerText = team;
-                clubSelect.appendChild(opt);
-            });
-        }
-
         function switchDivision(div) {
             currentDivision = div;
             document.getElementById('btn-d1').classList.toggle('active', div === 'D1');
             document.getElementById('btn-d2').classList.toggle('active', div === 'D2');
             document.getElementById('div-badge').innerText = div;
             
-            updateTeamsDropdown();
             loadKits();
             renderKits();
         }
 
         function addKitRecord() {
-            const clubSelect = document.getElementById('kit-club');
+            const clubInput = document.getElementById('kit-club');
             const ownerInput = document.getElementById('kit-owner');
             const tgInput = document.getElementById('kit-tg');
 
-            const clubVal = clubSelect.value;
+            const clubVal = clubInput.value.trim();
             const ownerVal = ownerInput.value.trim();
             let tgVal = tgInput.value.trim();
 
             if (!clubVal || !ownerVal) {
-                alert("Please select a club and enter a manager name!");
+                alert("Please enter both Club Name and Manager Name!");
                 return;
             }
 
             let displayTg = tgVal || "Not Provided";
-            let tgLink = tgVal ? `https://t.me/${tgVal.replace('@', '')}` : "";
+            // Автоматично прибираємо @ з посилання, якщо користувач його ввів
+            let cleanTg = tgVal.replace('@', '');
+            let tgLink = tgVal ? `https://t.me/${cleanTg}` : "";
 
             let newRecord = { 
                 id: Date.now(), 
                 club: clubVal, 
                 owner: ownerVal, 
-                tgDisplay: displayTg, 
+                tgDisplay: displayTg.startsWith('@') ? displayTg : (tgVal ? '@' + displayTg : displayTg), 
                 tgUrl: tgLink 
             };
 
-            // Видаляємо старий запис цього клубу, якщо він був, щоб замінити новим
-            kitsList = kitsList.filter(k => k.club !== clubVal);
+            // Якщо клуб з такою назвою вже є у списку цієї ліги — оновлюємо його
+            kitsList = kitsList.filter(k => k.club.toLowerCase() !== clubVal.toLowerCase());
             kitsList.push(newRecord);
+            
+            // Сортування за алфавітом назв клубів
             kitsList.sort((a,b) => a.club.localeCompare(b.club));
 
             saveKits();
             renderKits();
 
-            // Очищення полів після збереження
-            clubSelect.value = "";
+            // Очищення полів форми
+            clubInput.value = "";
             ownerInput.value = "";
             tgInput.value = "";
         }
@@ -470,12 +450,13 @@
             tbody.innerHTML = '';
             
             if(kitsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px;">No contacts added yet</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}" style="color: var(--text-muted); padding: 30px;">No contacts added yet for ${currentDivision}</td></tr>`;
                 return;
             }
 
             kitsList.forEach(record => {
-                let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link">${record.tgDisplay}</a>` : `<span>${record.tgDisplay}</span>`;
+                // Додаємо красиву кнопку з літачком Телеграму (✈)
+                let tgCell = record.tgUrl ? `<a href="${record.tgUrl}" target="_blank" class="tg-link"><span class="tg-icon">✈</span> ${record.tgDisplay}</a>` : `<span style="color: var(--text-muted); font-style: italic;">${record.tgDisplay}</span>`;
                 let actionCell = isAdmin ? `<td style="text-align: center;"><button class="btn-delete" onclick="deleteKitRecord(${record.id})">✕</button></td>` : '';
                 
                 tbody.innerHTML += `<tr>
@@ -488,11 +469,11 @@
         }
 
         function saveKits() { 
-            localStorage.setItem(`wfc_live_${currentDivision}`, JSON.stringify(kitsList)); 
+            localStorage.setItem(`wfc_v2_${currentDivision}`, JSON.stringify(kitsList)); 
         }
         
         function loadKits() { 
-            kitsList = JSON.parse(localStorage.getItem(`wfc_live_${currentDivision}`)) || []; 
+            kitsList = JSON.parse(localStorage.getItem(`wfc_v2_${currentDivision}`)) || []; 
         }
     </script>
 </body>
