@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Адмін Панель</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header-flex">
+            <h1>Панель Адміністратора</h1>
+            <button class="cancel-btn" onclick="logout()">Вийти</button>
+        </div>
+
+        <div class="card">
+            <h3>Оновити / Додати Команду</h3>
+            <form id="teamForm">
+                <input type="text" id="teamName" placeholder="Назва команди" required>
+                <input type="number" id="teamPlayed" placeholder="Зіграно матчів" required>
+                <input type="number" id="teamPoints" placeholder="Очки" required>
+                <button type="submit">Зберегти дані</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Перевірка авторизації
+        if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+
+        // ВСТАВТЕ ТАКИЙ Ж СВАЙ FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Збереження даних у базу
+        document.getElementById('teamForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('teamName').value;
+            const played = document.getElementById('teamPlayed').value;
+            const points = document.getElementById('teamPoints').value;
+
+            // Зберігаємо за назвою команды
+            database.ref('teams/' + name).set({
+                name: name,
+                played: played,
+                points: points
+            }).then(() => {
+                alert('Дані успішно оновлено!');
+                document.getElementById('teamForm').reset();
+            });
+        });
+
+        function logout() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
