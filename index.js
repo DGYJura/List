@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 🔗 Вкажіть тут ваш URL з Google Apps Script (Deploy -> Web app URL)
-const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwAZuA3hsRppAjMnf3d1YjrVM3Q7PfSrCjg4K-bkPIuBac-daY2MdE1dATdLC1ivPFZTw/exec";
 
 // Простий веб-сервер для Render, щоб сервіс вважав застосунок активним
 app.get('/', (req, res) => {
